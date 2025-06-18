@@ -218,6 +218,7 @@ integTest {
             exclude "${it}"
         }
     }
+    // if 
     systemProperty 'tests.security.manager', 'false'
     systemProperty 'java.io.tmpdir', es_tmp_dir.absolutePath
 
@@ -431,4 +432,12 @@ task updateVersion {
         ant.replaceregexp(file:'build.gradle', match: '"opensearch.version", "\\d.*"', replace: '"opensearch.version", "' + newVersion.tokenize('-')[0] + '-SNAPSHOT"', flags:'g', byline:true)
         ant.replaceregexp(file:'sample-extension-plugin/build.gradle', match: '"opensearch.version", "\\d.*"', replace: '"opensearch.version", "' + newVersion.tokenize('-')[0] + '-SNAPSHOT"', flags:'g', byline:true)
     }
+}
+
+// Skip all tests if -DskipTests=true is provided
+if (System.getProperty("skipTests", "false") == "true") {
+    tasks.withType(Test).configureEach { enabled = false }
+    tasks.matching { it.name == "javaRestTest" }.configureEach { enabled = false }
+    tasks.matching { it.name == "integTest" }.configureEach { enabled = false }
+    tasks.matching { it.name == "integTestRemote" }.configureEach { enabled = false }
 }
